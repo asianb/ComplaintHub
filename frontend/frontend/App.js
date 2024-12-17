@@ -1,33 +1,40 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigations/Navigator';
 import * as Font from 'expo-font';
-import AppLoading from 'expo-app-loading';
 
 export default class App extends React.Component {
   state = {
     isFontLoaded: false,
   };
 
+  async componentDidMount() {
+    await this.loadFonts();
+  }
+
   async loadFonts() {
-    await Font.loadAsync({
-      SemiBold: require('./src/fonts/NotoSerif_Condensed-SemiBold.ttf'),
-      Medium: require('./src/fonts/NotoSerif-Medium.ttf'),
-      Regular: require('./src/fonts/NotoSerif-Regular.ttf'),
-    });
+    try {
+      await Font.loadAsync({
+        SemiBold: require('./src/fonts/NotoSerif_Condensed-SemiBold.ttf'),
+        Medium: require('./src/fonts/NotoSerif-Medium.ttf'),
+        Regular: require('./src/fonts/NotoSerif-Regular.ttf'),
+      });
+      this.setState({ isFontLoaded: true });
+    } catch (err) {
+      console.error('Error loading fonts', err);
+    }
   }
 
   render() {
     const { isFontLoaded } = this.state;
 
     if (!isFontLoaded) {
+      // Show a loading indicator while fonts are loading
       return (
-        <AppLoading
-          startAsync={() => this.loadFonts()}
-          onFinish={() => this.setState({ isFontLoaded: true })}
-          onError={(err) => console.error(err)}
-        />
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
       );
     }
 
