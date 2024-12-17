@@ -6,7 +6,7 @@ export default class Login extends React.Component{
     render(){
         return(
             <view style={{background:"#FFF",height:"100%"}}>
-                <Image source={require('../images')}
+                <Image source={require('../images/image.jpg')}
                 style={{width:"100%",height:"43%"}}/>
                 <Text
                  style={{
