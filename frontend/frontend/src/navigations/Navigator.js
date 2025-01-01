@@ -45,13 +45,22 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
+import ComplaintForm from '../screens/ComplaintForm';
+import HomePage from '../screens/HomePage';
+import ViewComplaints from '../screens/ViewComplaints'; // Add this import
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => (
-  <Stack.Navigator>
-    <Stack.Screen name="Login" component={Login} />
-    <Stack.Screen name="Register" component={Register} />
+  <Stack.Navigator initialRouteName="HomePage">
+    {/* <Stack.Screen name="Login" component={Login} />
+    <Stack.Screen name="Register" component={Register} /> */}
+    <Stack.Screen name="HomePage" component={HomePage} options={{ title: 'דף הבית' }} />
+
+    <Stack.Screen name="ComplaintForm" component={ComplaintForm} />
+    <Stack.Screen 
+      name="ViewComplaints" 
+      component={ViewComplaints} />
   </Stack.Navigator>
 );
 
