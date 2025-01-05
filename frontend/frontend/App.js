@@ -3,6 +3,9 @@ import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigations/Navigator';
 import * as Font from 'expo-font';
+import icons from './src/fonts/icons/icon.js'; 
+import icon from './src/fonts/icons/icon.js';
+
 
 export default class App extends React.Component {
   state = {
@@ -54,3 +57,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+

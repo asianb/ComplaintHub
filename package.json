@@ -16,6 +16,8 @@
     "dotenv": "^16.4.7",
     "expo-app-loading": "^1.0.3",
     "expo-font": "^13.0.1",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "@react-native-community/cli": "latest"
+
   }
 }
