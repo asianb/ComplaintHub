@@ -436,7 +436,7 @@ const ComplaintForm = ({ navigation }) => {
   };
 
   // Server configuration
-  const SERVER_URL = 'http://172.19.43.232:5000';
+  const SERVER_URL = 'http://192.168.23.111:5000';
  // Request location permissions and get initial location
  useEffect(() => {
   (async () => {
