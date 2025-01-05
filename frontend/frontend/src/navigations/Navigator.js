@@ -2,8 +2,17 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
+import ComplaintForm from '../screens/ComplaintForm';
+import HomePage from '../screens/HomePage';
+import ViewComplaints from '../screens/ViewComplaints'; // Add this import
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import ManagerDashboard from '../screens/ManagerDashboard';
+import EmployeeDashboard from '../screens/EmployeeDashboard';
+import EmployeeList from '../screens/EmployeeList'
+import ProfilePage from '../screens/ProfilePage'
+import ChatInterface from '../screens/chat'
 import WelcomeScreen from '../screens/welcomescreen';
-import LoginScreen from '../screens/loginScreen';
 import HomeTabs from '../screens/homePageC'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -42,19 +51,57 @@ const HomePage = () => (
 );
 const Stack = createStackNavigator();
 const AppNavigator = () => (
-  
-  
-  <Stack.Navigator
-  screenOptions={{
-    headerShown: false,
-  }}>
-    <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
-    <Stack.Screen name="LoginScreen" component={LoginScreen} />
-    <Stack.Screen name="Login" component={Login} />
-    <Stack.Screen name="Register" component={Register} />
-    <Stack.Screen name="HomePage" component={HomePage} />
-    
+  <Stack.Navigator initialRouteName="ComplaintForm">
+      <Stack.Screen 
+        name="Login" 
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="Register" 
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
+<Stack.Screen 
+        name="ManagerDashboard" 
+        component={ManagerDashboard}
+        options={{ 
+          headerLeft: null,
+          headerShown: false 
+        }}
+      />
+      <Stack.Screen 
+        name="EmployeeDashboard" 
+        component={EmployeeDashboard}
+        options={{ 
+          headerLeft: null,
+          headerShown: false 
+        }}
+        
+      />
+<Stack.Screen 
+  name="EmployeeList" 
+  component={EmployeeList}
+  options={{
+    headerShown: false
+  }}
+/>
 
+<Stack.Screen 
+  name="ProfilePage" 
+  component={ProfilePage}
+  options={{
+    headerShown: false
+  }}
+/>
+<Stack.Screen name="Chat" component={ChatInterface} />
+
+    <Stack.Screen name="HomePage" component={HomePage} options={{ title: 'דף הבית' }} />
+
+    <Stack.Screen name="ComplaintForm" component={ComplaintForm} />
+    <Stack.Screen 
+      name="ViewComplaints" 
+      component={ViewComplaints} />
   </Stack.Navigator>
 );
 
