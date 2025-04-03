@@ -50,7 +50,7 @@ const ChatInterface = ({ route, navigation }) => {
 //   };
 const fetchMessages = async () => {
     try {
-      const response = await fetch(`http://192.168.23.111:3000/api/messages/${currentUser.idNumber}?otherUser=${selectedUser.idNumber}`);
+      const response = await fetch(`http://172.19.36.139:3000/api/messages/${currentUser.idNumber}?otherUser=${selectedUser.idNumber}`);
   
       // אם התגובה לא מצליחה, הדפס את סטטוס הקוד ואת התגובה
       if (!response.ok) {
@@ -74,7 +74,7 @@ const fetchMessages = async () => {
     if (!newMessage.trim()) return;
 
     try {
-      const response = await fetch('http://192.168.23.111:3000/api/messages', {
+      const response = await fetch('http://172.19.36.139:3000/api/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

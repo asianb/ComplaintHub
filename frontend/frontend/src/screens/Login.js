@@ -6,40 +6,73 @@ import { ArrowLeftIcon } from 'react-native-heroicons/outline';
 import { ScrollView } from 'react-native-gesture-handler';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login({ navigation }) {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   
 
-  function handleSubmit() {
+  async function handleSubmit() {
     console.log("Login button pressed");
     
-    const userData = {
-      id: id,
-      password: password,
-    };
-  
-    axios.post("http://10.0.0.4:5001/login-user", userData)
-      .then(res => {
-        console.log("Server response:", res.data);
-        if (res.data.status === "ok") {
-          Alert.alert("הצלחה", res.data.message, [
-            {
-              text: "OK",
-              onPress: () => navigation.navigate('HomePage')
-            }
-          ]);
-        }
-      })
-      .catch(err => {
-        console.log("Error details:", err.response?.data);
-        
-        const errorMessage = err.response?.data?.message || "אירעה שגיאה, אנא נסי שוב";
-        
-        Alert.alert("שגיאה", errorMessage);
+    // const userData = {
+    //   id: id,
+    //   password: password,
+    // };
+    if (!id || !password) {
+      Alert.alert('שגיאה', 'נא למלא את כל השדות');
+      return;
+    }
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post('http://172.19.36.139:5001/login-user', {
+        id,
+        password
       });
+
+      if (response.data.status === 'ok') {
+        // Save token
+        await AsyncStorage.setItem('userToken', response.data.data);
+        // Save user ID (might be useful for future features)
+        await AsyncStorage.setItem('userId', id);
+        
+        Alert.alert('הצלחה', response.data.message);
+        navigation.replace('CitizenDashboard'); 
+      }
+    } catch (error) {
+      console.log("Error details:", error.response?.data);
+
+      let errorMessage = 'שגיאה בהתחברות';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      Alert.alert('שגיאה', errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+    // axios.post("http://172.19.36.139:5001/login-user", userData)
+    //   .then(res => {
+    //     console.log("Server response:", res.data);
+    //     if (res.data.status === "ok") {
+    //       Alert.alert("הצלחה", res.data.message, [
+    //         {
+    //           text: "OK",
+    //           onPress: () => navigation.navigate('HomePage')
+    //         }
+    //       ]);
+    //     }
+    //   })
+    //   .catch(err => {
+    //     console.log("Error details:", err.response?.data);
+        
+    //     const errorMessage = err.response?.data?.message || "אירעה שגיאה, אנא נסי שוב";
+        
+    //     Alert.alert("שגיאה", errorMessage);
+    //   });
   }
 
 

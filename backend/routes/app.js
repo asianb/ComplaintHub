@@ -1,5 +1,5 @@
 
-// Server-side (Express)
+//app.js
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -10,9 +10,10 @@ const bcrypt=require("bcryptjs");
 app.use(cors());
 app.use(express.json());
 
-const mongoUrl = "mongodb+srv://asia123aq:admin@cluster0.x5kst.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const mongoUrl = "mongodb+srv://anfalnbbari7:anfal@cluster0.rd4kb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-const JWT_SECRET="hvdvay6ert72839289()aiyg8t87qt72393293883uhefiuh78ttq3ifi78272jdsds039[]pou89ywe";
+// const JWT_SECRET="hvdvay6ert72839289()aiyg8t87qt72393293883uhefiuh78ttq3ifi78272jdsds039[]pou89ywe";
+const JWT_SECRET = "ejrbhjlsbsihgbrwhgsbdbgf";
 
 // Improved MongoDB connection with retry logic
 const connectDB = async () => {
@@ -210,7 +211,29 @@ app.put('/api/profile/:id/change-password', verifyToken, async (req, res) => {
   }
 });
 
+  
+// נתיב להצגת רשימת העובדים
+app.get('/api/Citizen', async (req, res) => {
+  try {
+    const Citizen = await User.find().select('-password');
+    res.json(Citizen);
+  } catch (error) {
+    res.status(500).json({ error: 'שגיאה בטעינת רשימת Citizen' });
+  }
+});
 
+// נתיב למחיקת עובד
+app.delete('/api/Citizen/:id', async (req, res) => {
+  try {
+    const Citizen = await User.findOneAndDelete({ _id: req.params.id });
+    if (!Citizen) {
+      return res.status(404).json({ error: 'Citizen לא נמצא' });
+    }
+    res.json({ message: 'Citizen נמחק בהצלחה' });
+  } catch (error) {
+    res.status(500).json({ error: 'שגיאה במחיקת Citizen' });
+  }
+});
 
 
 app.use(cors({

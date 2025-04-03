@@ -383,6 +383,7 @@
 
 // export default ComplaintForm;
 
+//ComplaintForm.js
 import React, { useState } from 'react';
 import {
   View,
@@ -404,6 +405,7 @@ import * as ImagePicker from 'expo-image-picker';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ComplaintForm = ({ navigation }) => {
   // State management
@@ -425,6 +427,9 @@ const ComplaintForm = ({ navigation }) => {
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [token, setToken] = useState(null);
+
+
 
   // Categories with icons
   const categories = ['Infrastructure', 'Lighting', 'Noise', 'Cleaning'];
@@ -436,9 +441,25 @@ const ComplaintForm = ({ navigation }) => {
   };
 
   // Server configuration
-  const SERVER_URL = 'http://192.168.23.111:5000';
+  const SERVER_URL = 'http://172.19.36.139:5000';
  // Request location permissions and get initial location
  useEffect(() => {
+  const getToken = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem('userToken');
+      if (!userToken) {
+        Alert.alert('שגיאה', 'נא להתחבר למערכת');
+        navigation.navigate('Login');
+        return;
+      }
+      setToken(userToken);
+    } catch (error) {
+      console.error('Error getting token:', error);
+      Alert.alert('שגיאה', 'בעיה בהתחברות למערכת');
+      navigation.navigate('Login');
+    }
+  };
+  getToken();
   (async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -645,71 +666,153 @@ const handleMarkerDrag = async (e) => {
   //   }
   // };
   // Updated handleSubmit with location data
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
-    
-    setIsLoading(true);
-    
-    try {
-      const isConnected = await testConnection();
-      if (!isConnected) {
-        Alert.alert('שגיאת חיבור', 'לא ניתן להתחבר לשרת. אנא נסה שוב מאוחר יותר');
+
+
+    // Update handleSubmit to include token
+    const handleSubmit = async () => {
+      if (!token) {
+        Alert.alert('שגיאה', 'נא להתחבר למערכת');
+        navigation.navigate('Login');
         return;
       }
+      const userId = await AsyncStorage.getItem('userId');
 
-      const formData = new FormData();
-      formData.append('title', title.trim());
-      formData.append('description', description.trim());
-      formData.append('category', category);
-      formData.append('address', address.trim());
-      formData.append('location', JSON.stringify({
-        latitude: location.latitude,
-        longitude: location.longitude
-      }));
-
-      // Add images to FormData
-      images.forEach((image, index) => {
-        const imageUri = Platform.OS === 'ios' ? image.replace('file://', '') : image;
-        const imageName = imageUri.split('/').pop();
-        formData.append('images', {
-          uri: imageUri,
-          type: 'image/jpeg',
-          name: imageName || `image${index}.jpg`,
-        });
-      });
-
-      const response = await axios.post(`${SERVER_URL}/api/complaints`, formData, {
-        timeout: 30000,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
-      });
+      if (!validateForm()) return;
       
-      if (response.data.status === 'success') {
-        Alert.alert('הצלחה', 'התלונה נשלחה בהצלחה');
-        // Clear form
-        setTitle('');
-        setDescription('');
-        setCategory('');
-        setAddress('');
-        setImages([]);
-        setSearchQuery('');
+      setIsLoading(true);
+      
+      try {
+        const isConnected = await testConnection();
+        if (!isConnected) {
+          Alert.alert('שגיאת חיבור', 'לא ניתן להתחבר לשרת. אנא נסה שוב מאוחר יותר');
+          return;
+        }
+  
+        const formData = new FormData();
+        formData.append('userId',userId );
+        formData.append('title', title.trim());
+        formData.append('description', description.trim());
+        formData.append('category', category);
+        formData.append('address', address.trim());
+        formData.append('location', JSON.stringify({
+          latitude: location.latitude,
+          longitude: location.longitude
+        }));
+  
+        images.forEach((image, index) => {
+          const imageUri = Platform.OS === 'ios' ? image.replace('file://', '') : image;
+          const imageName = imageUri.split('/').pop();
+          formData.append('images', {
+            uri: imageUri,
+            type: 'image/jpeg',
+            name: imageName || `image${index}.jpg`,
+          });
+        });
+  
+        const response = await axios.post(`${SERVER_URL}/api/complaints`, formData, {
+          timeout: 30000,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}` // Add token to headers
+          }
+        });
+        
+        if (response.data.status === 'success') {
+          Alert.alert('הצלחה', 'התלונה נשלחה בהצלחה');
+          // Clear form
+          setTitle('');
+          setDescription('');
+          setCategory('');
+          setAddress('');
+          setImages([]);
+          setSearchQuery('');
+        }
+      } catch (error) {
+        console.error('Error details:', error);
+        let errorMessage = 'שליחת התלונה נכשלה';
+        
+        if (error.response?.status === 401) {
+          errorMessage = 'נא להתחבר מחדש למערכת';
+          AsyncStorage.removeItem('userToken');
+          navigation.navigate('Login');
+        } else if (error.code === 'ECONNABORTED') {
+          errorMessage = 'תם הזמן הקצוב לחיבור - אנא נסה שוב';
+        } else if (error.response) {
+          errorMessage = `שגיאת שרת: ${error.response.data?.message || 'שגיאה לא ידועה'}`;
+        } else if (error.request) {
+          errorMessage = 'אין תגובה מהשרת - בדוק את החיבור שלך';
+        }
+        
+        Alert.alert('שגיאה', errorMessage);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error details:', error);
-      let errorMessage = 'שליחת התלונה נכשלה';
-      if (error.code === 'ECONNABORTED') {
-        errorMessage = 'תם הזמן הקצוב לחיבור - אנא נסה שוב';
-      } else if (error.response) {
-        errorMessage = `שגיאת שרת: ${error.response.data?.message || 'שגיאה לא ידועה'}`;
-      } else if (error.request) {
-        errorMessage = 'אין תגובה מהשרת - בדוק את החיבור שלך';
-      }
-      Alert.alert('שגיאה', errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+  // const handleSubmit = async () => {
+  //   if (!validateForm()) return;
+    
+  //   setIsLoading(true);
+    
+  //   try {
+  //     const isConnected = await testConnection();
+  //     if (!isConnected) {
+  //       Alert.alert('שגיאת חיבור', 'לא ניתן להתחבר לשרת. אנא נסה שוב מאוחר יותר');
+  //       return;
+  //     }
+
+  //     const formData = new FormData();
+  //     formData.append('title', title.trim());
+  //     formData.append('description', description.trim());
+  //     formData.append('category', category);
+  //     formData.append('address', address.trim());
+  //     formData.append('location', JSON.stringify({
+  //       latitude: location.latitude,
+  //       longitude: location.longitude
+  //     }));
+
+  //     // Add images to FormData
+  //     images.forEach((image, index) => {
+  //       const imageUri = Platform.OS === 'ios' ? image.replace('file://', '') : image;
+  //       const imageName = imageUri.split('/').pop();
+  //       formData.append('images', {
+  //         uri: imageUri,
+  //         type: 'image/jpeg',
+  //         name: imageName || `image${index}.jpg`,
+  //       });
+  //     });
+
+  //     const response = await axios.post(`${SERVER_URL}/api/complaints`, formData, {
+  //       timeout: 30000,
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //       }
+  //     });
+      
+  //     if (response.data.status === 'success') {
+  //       Alert.alert('הצלחה', 'התלונה נשלחה בהצלחה');
+  //       // Clear form
+  //       setTitle('');
+  //       setDescription('');
+  //       setCategory('');
+  //       setAddress('');
+  //       setImages([]);
+  //       setSearchQuery('');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error details:', error);
+  //     let errorMessage = 'שליחת התלונה נכשלה';
+  //     if (error.code === 'ECONNABORTED') {
+  //       errorMessage = 'תם הזמן הקצוב לחיבור - אנא נסה שוב';
+  //     } else if (error.response) {
+  //       errorMessage = `שגיאת שרת: ${error.response.data?.message || 'שגיאה לא ידועה'}`;
+  //     } else if (error.request) {
+  //       errorMessage = 'אין תגובה מהשרת - בדוק את החיבור שלך';
+  //     }
+  //     Alert.alert('שגיאה', errorMessage);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <SafeAreaView style={styles.container}>

@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 
 const { width } = Dimensions.get('window');
-const API_BASE_URL = 'http://192.168.23.111/api';
+const API_BASE_URL = 'http://172.19.36.139/api';
 
 const MenuCard = ({ title, icon, count, color, onPress }) => (
   <Card style={[styles.menuCard, { borderLeftColor: color }]} onPress={onPress}>
@@ -118,7 +118,7 @@ const ManagerDashboard = ({ navigation }) => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('userRole');
-    navigation.replace('Login');
+    navigation.replace('loginScreen');
   };
 
   const menuItems = [
@@ -134,14 +134,14 @@ const ManagerDashboard = ({ navigation }) => {
       icon: 'account-multiple',
       count: '158',
       color: '#2196F3',
-      onPress: () => navigation.navigate('CitizensList')
+      onPress: () => navigation.navigate('CitizenList')
     },
     {
       title: 'תלונות פתוחות',
       icon: 'message-alert',
       count: '5',
       color: '#F44336',
-      onPress: () => navigation.navigate('ComplaintsList')
+      onPress: () => navigation.navigate('ViewComplaints')
     },
     {
       title: 'הפרופיל שלי',

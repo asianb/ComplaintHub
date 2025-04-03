@@ -8,7 +8,7 @@ import axios from 'axios';
 import { Activity, Calendar, Clock, UserCheck } from 'lucide-react';
 
 const { width } = Dimensions.get('window');
-const API_BASE_URL = 'http://192.168.23.111:3000/api';
+const API_BASE_URL = 'http://172.19.36.139:3000/api';
 
 
 const MenuCard = ({ title, icon, color, onPress }) => (
@@ -76,7 +76,7 @@ const EmployeeDashboard = ({ navigation }) => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('userRole');
-    navigation.replace('Login');
+    navigation.replace('loginScreen');
   };
   const navigateToChat = async (managerUserId) => {
     try {

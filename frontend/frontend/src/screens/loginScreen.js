@@ -1,102 +1,3 @@
-// // LoginScreen.js
-// import React, { useState } from 'react';
-// import { View, StyleSheet } from 'react-native';
-// import { TextInput, Button, Title, Surface } from 'react-native-paper';
-// import axios from 'axios';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// const LoginScreen = ({ navigation }) => {
-//   const [idNumber, setIdNumber] = useState('');
-//   const [password, setPassword] = useState('');
-
-//   const handleLogin = async () => {
-//     try {
-//       const response = await axios.post('http://192.168.1.4:3000/api/login', {
-//         idNumber,
-//         password
-//       });
-      
-//       await AsyncStorage.setItem('token', response.data.token);
-//       await AsyncStorage.setItem('userRole', response.data.user.role);
-//       await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
-
-//       if (response.data.user.role === 'manager') {
-//         navigation.replace('ManagerDashboard');
-//       } else {
-//         navigation.replace('EmployeeDashboard');
-//       }
-//     } catch (error) {
-//       alert(error.response?.data?.error || 'ההתחברות נכשלה');
-//     }
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Surface style={styles.surface}>
-//         <Title style={styles.title}>מערכת ניהול תלונות</Title>
-//         <TextInput
-//           label="מספר זהות"
-//           value={idNumber}
-//           onChangeText={setIdNumber}
-//           style={styles.input}
-//           mode="outlined"
-//           keyboardType="numeric"
-//           maxLength={9}
-//         />
-//         <TextInput
-//           label="סיסמה"
-//           value={password}
-//           onChangeText={setPassword}
-//           secureTextEntry
-//           style={styles.input}
-//           mode="outlined"
-//         />
-//         <Button mode="contained" onPress={handleLogin} style={styles.button}>
-//           התחבר
-//         </Button>
-//         <Button
-//           mode="text"
-//           onPress={() => navigation.navigate('Register')}
-//           style={styles.button}
-//         >
-//           הרשמה למשתמש חדש
-//         </Button>
-//       </Surface>
-//     </View>
-//   );
-// };
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 20,
-//     backgroundColor: '#f5f5f5'
-//   },
-//   surface: {
-//     padding: 20,
-//     elevation: 4,
-//     borderRadius: 10,
-//     marginVertical: 20
-//   },
-//   title: {
-//     textAlign: 'center',
-//     marginBottom: 20
-//   },
-//   input: {
-//     marginBottom: 10
-//   },
-//   radioContainer: {
-//     marginVertical: 10
-//   },
-//   radioButton: {
-//     flexDirection: 'row',
-//     alignItems: 'center'
-//   },
-//   button: {
-//     marginTop: 10
-//   }
-// });
-
-// export default LoginScreen;
 
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, ScrollView } from 'react-native';
@@ -117,7 +18,7 @@ export default function LoginScreen({ navigation }) {
     }
 
     try {
-      const response = await axios.post('http://192.168.23.111:3000/api/login', {
+      const response = await axios.post('http://172.19.36.139:3000/api/login', {
         idNumber,
         password
       });
@@ -202,7 +103,7 @@ export default function LoginScreen({ navigation }) {
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>
               אין לך חשבון?{' '}
-              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+              <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
                 <Text style={styles.signUpLink}>הרשם</Text>
               </TouchableOpacity>
             </Text>
@@ -301,3 +202,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold' 
   }
 });
+
+

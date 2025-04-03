@@ -603,7 +603,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
-const API_BASE_URL = 'http://192.168.23.111:3000/api';
+const API_BASE_URL = 'http://172.19.36.139:3000/api';
 
 // Custom Input Component
 const CustomInput = ({ label, value, onChangeText, secureTextEntry, placeholder }) => (

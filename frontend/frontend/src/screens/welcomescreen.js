@@ -2,18 +2,18 @@ import React from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default function WelcomeScreen({ navigation }) {
+const WelcomeScreen=({ navigation })=> {
   return (
     <LinearGradient
     colors={[ '#FFFFFF','#00b4d8','#00b4d8','#FFFFFF']} 
       style={styles.container}
     >
       <SafeAreaView style={styles.innerContainer}>
-        <Text style={styles.title}>Welcome to the App</Text>
-        <Text style={styles.subtitle}>Your journey starts here</Text>
+        <Text style={styles.title}>Welcome to ComplaintHub</Text>
+        <Text style={styles.subtitle}></Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('LoginScreen')} // Change 'NextScreen' to your actual route name
+          onPress={() => navigation.navigate('loginOption')} // Change 'NextScreen' to your actual route name
         >
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
@@ -21,7 +21,6 @@ export default function WelcomeScreen({ navigation }) {
     </LinearGradient>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -63,3 +62,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default  WelcomeScreen;
+

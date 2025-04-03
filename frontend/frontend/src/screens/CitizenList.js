@@ -1,4 +1,3 @@
-//EmployeeList.js
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -14,35 +13,42 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-const EmployeeList = ({ navigation }) => {
-  const [employees, setEmployees] = useState([]);
+const CitizenList = ({ navigation }) => {
+  const [citizens, setCitizens] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchEmployees();
+    fetchCitizens();
   }, []);
 
-  const fetchEmployees = async () => {
+  const fetchCitizens = async () => {
     try {
-      const response = await fetch('http://172.19.36.139:3000/api/employees');
+      const response = await fetch('http://172.19.36.139:5001/api/Citizen');
       if (!response.ok) {
-        throw new Error('Failed to fetch employees');
+        throw new Error('Failed to fetch citizens');
       }
       const data = await response.json();
-      setEmployees(data);
+      // Filter out any null or undefined items
+      const validData = data.filter(item => item && item._id);
+      setCitizens(validData);
     } catch (error) {
-      console.error('Error fetching employees:', error);
-      Alert.alert('שגיאה', 'לא ניתן לטעון את רשימת העובדים');
+      console.error('Error fetching citizens:', error);
+      Alert.alert('שגיאה', 'לא ניתן לטעון את רשימת האזרחים');
+      setCitizens([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
 
-  const deleteEmployee = async (employeeId) => {
+  const deleteCitizen = async (citizenId) => {
+    if (!citizenId) {
+      console.error('Invalid citizen ID');
+      return;
+    }
+
     Alert.alert(
       'אישור מחיקה',
-      'האם אתה בטוח שברצונך למחוק עובד זה?',
+      'האם אתה בטוח שברצונך למחוק אזרח זה?',
       [
         { text: 'ביטול', style: 'cancel' },
         {
@@ -50,38 +56,36 @@ const EmployeeList = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(`http://172.19.36.139:3000/api/employees/${employeeId}`, {
+              const response = await fetch(`http://172.19.36.139:5001/api/Citizen/${citizenId}`, {
                 method: 'DELETE',
               });
               if (!response.ok) {
-                throw new Error('Failed to delete employee');
+                throw new Error('Failed to delete citizen');
               }
-              setEmployees(employees.filter(emp => emp._id !== employeeId));
-              Alert.alert('הצלחה', 'העובד נמחק בהצלחה');
+              setCitizens(citizens.filter(citizen => citizen._id !== citizenId));
+              Alert.alert('הצלחה', 'האזרח נמחק בהצלחה');
             } catch (error) {
-              console.error('Error deleting employee:', error);
-              Alert.alert('שגיאה', 'לא ניתן למחוק את העובד');
+              console.error('Error deleting citizen:', error);
+              Alert.alert('שגיאה', 'לא ניתן למחוק את האזרח');
             }
           }
         }
       ]
     );
   };
-  const anfal = async (employee_id) => {
-    console.log('anfaaaaaaaaaaal'); // הדפיסי את currentUser
 
-  }
-  const navigateToChat = async (employee_id) => {
+  const navigateToChat = async (citizen_id) => {
+    if (!citizen_id) {
+      console.error('Invalid citizen ID');
+      return;
+    }
+
     try {
       const storedUser = await AsyncStorage.getItem('user');
-      console.log('Stored User:', storedUser); // הדפסת המידע שנשמר ב-AsyncStorage
       const currentUser = storedUser ? JSON.parse(storedUser) : null;
-      const selectedEmployee = employees.find(emp => emp._id === employee_id);
+      const selectedCitizen = citizens.find(citizen => citizen && citizen._id === citizen_id);
   
-      console.log('Current User:', currentUser); // הדפיסי את currentUser
-      console.log('Selected Employee:', selectedEmployee); // הדפיסי את selectedEmployee
-  
-      if (!selectedEmployee) {
+      if (!selectedCitizen) {
         Alert.alert("שגיאה", "לא נמצא משתמש מתאים.");
         return;
       }
@@ -91,23 +95,32 @@ const EmployeeList = ({ navigation }) => {
         return;
       }
   
-      try {
-        navigation.navigate('Chat', {
-          currentUser: currentUser,
-          selectedUser: selectedEmployee,
-        });
-      } catch (error) {
-        console.error('Error navigating to Chat:', error);
-        Alert.alert('שגיאה', 'אירעה שגיאה בעת מעבר לצ\'אט');
-      }
-  
+      navigation.navigate('Chat', {
+        currentUser: currentUser,
+        selectedUser: selectedCitizen,
+      });
     } catch (error) {
       console.error('Error in navigateToChat:', error);
+      Alert.alert('שגיאה', 'אירעה שגיאה בעת מעבר לצ\'אט');
     }
   };
-  
 
-  const renderEmployee = ({ item, index }) => {
+  const getInitials = (name) => {
+    if (!name) return '';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`;
+    }
+    return name[0];
+  };
+
+  const renderCitizen = ({ item, index }) => {
+    // Add safety check for item
+    if (!item || !item.name) {
+      console.error('Invalid item data:', item);
+      return null;
+    }
+
     const animatedValue = new Animated.Value(0);
     
     Animated.timing(animatedValue, {
@@ -120,7 +133,7 @@ const EmployeeList = ({ navigation }) => {
     return (
       <Animated.View
         style={[
-          styles.employeeCard,
+          styles.citizenCard,
           {
             opacity: animatedValue,
             transform: [{
@@ -135,42 +148,46 @@ const EmployeeList = ({ navigation }) => {
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {item.firstName[0]}{item.lastName[0]}
+              {getInitials(item.name)}
             </Text>
           </View>
         </View>
-        <View style={styles.employeeInfo}>
-          <Text style={styles.employeeName}>{item.firstName} {item.lastName}</Text>
-          <Text style={styles.roleText}>{item.role}</Text>
+        <View style={styles.citizenInfo}>
+          <Text style={styles.citizenName}>{item.name}</Text>
           <View style={styles.detailsContainer}>
             <View style={styles.detailRow}>
               <Icon name="badge" size={16} color="#666" />
-              <Text style={styles.employeeDetail}>{item.idNumber}</Text>
+              <Text style={styles.citizenDetail}>{item.id || 'אין מספר זהות'}</Text>
             </View>
             <View style={styles.detailRow}>
               <Icon name="email" size={16} color="#666" />
-              <Text style={styles.employeeDetail}>{item.email}</Text>
+              <Text style={styles.citizenDetail}>{item.email || 'אין אימייל'}</Text>
             </View>
             <View style={styles.detailRow}>
               <Icon name="phone" size={16} color="#666" />
-              <Text style={styles.employeeDetail}>{item.phoneNumber}</Text>
+              <Text style={styles.citizenDetail}>{item.phone || 'אין מספר טלפון'}</Text>
             </View>
           </View>
         </View>
         <View style={styles.actionButtons}>
-        <TouchableOpacity  
-        style={styles.chatButton}
-        onPress={() => {
-            console.log('Chat Button Pressed');
-            navigateToChat(item._id);
-        }}
-        >
-        <Icon name="chat" size={24} color="#007AFF" />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.chatButton}
+            onPress={() => {
+              if (item._id) {
+                navigateToChat(item._id);
+              }
+            }}
+          >
+            <Icon name="chat" size={24} color="#007AFF" />
+          </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.deleteButton}
-            onPress={() => deleteEmployee(item._id)}
+            onPress={() => {
+              if (item._id) {
+                deleteCitizen(item._id);
+              }
+            }}
           >
             <Icon name="delete-outline" size={24} color="#ff4444" />
           </TouchableOpacity>
@@ -188,25 +205,25 @@ const EmployeeList = ({ navigation }) => {
         >
           <Icon name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>רשימת עובדים</Text>
+        <Text style={styles.headerTitle}>רשימת אזרחים</Text>
         <View style={styles.headerRight} />
       </View>
 
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>טוען רשימת עובדים...</Text>
+          <Text style={styles.loadingText}>טוען רשימת אזרחים...</Text>
         </View>
       ) : (
         <FlatList
-          data={employees}
-          renderItem={renderEmployee}
-          keyExtractor={item => item._id}
+          data={citizens}
+          renderItem={renderCitizen}
+          keyExtractor={item => item?._id?.toString() || Math.random().toString()}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Icon name="people-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>לא נמצאו עובדים</Text>
+              <Text style={styles.emptyText}>לא נמצאו אזרחים</Text>
             </View>
           }
         />
@@ -216,18 +233,18 @@ const EmployeeList = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    actionButtons: {
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        paddingVertical: 8,
-      },
-      chatButton: {
-        padding: 8,
-        marginBottom: 8,
-      },
-      deleteButton: {
-        padding: 8,
-      },
+  actionButtons: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+  },
+  chatButton: {
+    padding: 8,
+    marginBottom: 8,
+  },
+  deleteButton: {
+    padding: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
@@ -266,7 +283,7 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
   },
-  employeeCard: {
+  citizenCard: {
     flexDirection: 'row',
     backgroundColor: '#fff',
     padding: 16,
@@ -298,19 +315,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  employeeInfo: {
+  citizenInfo: {
     flex: 1,
   },
-  employeeName: {
+  citizenName: {
     fontSize: 18,
     fontWeight: '600',
     color: '#2c3e50',
-    textAlign: 'right',
-  },
-  roleText: {
-    fontSize: 14,
-    color: '#007AFF',
-    marginTop: 2,
     textAlign: 'right',
   },
   detailsContainer: {
@@ -322,15 +333,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
     justifyContent: 'flex-end',
   },
-  employeeDetail: {
+  citizenDetail: {
     fontSize: 14,
     color: '#666',
     marginRight: 8,
     textAlign: 'right',
   },
-//   deleteButton: {
-//     padding: 8,
-//   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -345,4 +353,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EmployeeList;
+export default CitizenList;

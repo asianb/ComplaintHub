@@ -1,513 +1,4 @@
-// import React, { useState, useEffect } from 'react';
-// import {View,Text,TextInput,TouchableOpacity,ActivityIndicator,StyleSheet,Animated,ScrollView,} from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import axios from 'axios';
-// import { useNavigation } from '@react-navigation/native';
 
-// const API_BASE_URL = 'http://10.0.0.4:5001/api';
-
-// // Custom Input Component
-// const CustomInput = ({ label, value, onChangeText, secureTextEntry, placeholder }) => (
-//   <View style={styles.inputContainer}>
-//     <Text style={styles.inputLabel}>{label}</Text>
-//     <TextInput
-//       style={styles.input}
-//       value={value}
-//       onChangeText={onChangeText}
-//       secureTextEntry={secureTextEntry}
-//       placeholder={placeholder}
-//       placeholderTextColor="#9ca3af"
-//     />
-//   </View>
-// );
-
-// // Avatar Component
-// const ProfileAvatar = ({ firstName, lastName }) => {
-//   const initials = `${firstName?.[0] || ''}${lastName?.[0] || ''}`;
-//   return (
-//     <View style={styles.avatarContainer}>
-//       <View style={styles.avatar}>
-//         <Text style={styles.avatarText}>{initials}</Text>
-//       </View>
-//     </View>
-//   );
-// };
-
-// // Info Card Component
-// const InfoCard = ({ label, value }) => (
-//   <View style={styles.infoCard}>
-//     <Text style={styles.infoLabel}>{label}</Text>
-//     <Text style={styles.infoValue}>{value}</Text>
-//   </View>
-// );
-
-// // Status Message Component
-// const StatusMessage = ({ error, success }) => {
-//   if (!error && !success) return null;
-  
-//   return (
-//     <Text style={[
-//       styles.statusMessage,
-//       error ? styles.errorMessage : styles.successMessage
-//     ]}>
-//       {error || success}
-//     </Text>
-//   );
-// };
-
-// // Modal Component with Animation
-// const AnimatedModal = ({ visible, onClose, children }) => {
-//   const [slideAnim] = useState(new Animated.Value(0));
-
-//   useEffect(() => {
-//     if (visible) {
-//       Animated.spring(slideAnim, {
-//         toValue: 1,
-//         useNativeDriver: true,
-//       }).start();
-//     } else {
-//       Animated.timing(slideAnim, {
-//         toValue: 0,
-//         duration: 200,
-//         useNativeDriver: true,
-//       }).start();
-//     }
-//   }, [visible]);
-
-//   if (!visible) return null;
-
-//   return (
-//     <View style={styles.modalOverlay}>
-//       <TouchableOpacity 
-//         style={styles.modalBackdrop} 
-//         onPress={onClose}
-//         activeOpacity={1}
-//       />
-//       <Animated.View
-//         style={[
-//           styles.modalContent,
-//           {
-//             transform: [
-//               {
-//                 translateY: slideAnim.interpolate({
-//                   inputRange: [0, 1],
-//                   outputRange: [600, 0],
-//                 }),
-//               },
-//             ],
-//           },
-//         ]}
-//       >
-//         {children}
-//       </Animated.View>
-//     </View>
-//   );
-// };
-
-// // Edit Profile Modal Component
-// const EditProfileModal = ({ userData, onClose, onSave }) => {
-//   const [formData, setFormData] = useState({
-//     email: userData.email || '',
-//     phone: userData.phone || '',
-//     address: userData.address || '',
-//   });
-//   const [status, setStatus] = useState({
-//     error: '',
-//     success: '',
-//   });
-
-//   const handleSubmit = async () => {
-//     try {
-//       const user = JSON.parse(await AsyncStorage.getItem('user'));
-//       const token = await AsyncStorage.getItem('token');
-
-//       const response = await axios.put(
-//         `${API_BASE_URL}/update-user`,
-//         { id: user.id, ...formData },
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-
-//       setStatus({ error: '', success: 'הפרופיל עודכן בהצלחה' });
-//       setTimeout(() => {
-//         onSave(response.data.user);
-//         onClose();
-//       }, 2000);
-//     } catch (error) {
-//       setStatus({
-//         error: error.response?.data?.message || 'שגיאה בעדכון הפרופיל',
-//         success: '',
-//       });
-//     }
-//   };
-
-//   return (
-//     <View style={styles.modalInner}>
-//       <Text style={styles.modalTitle}>עריכת פרופיל</Text>
-//       <StatusMessage error={status.error} success={status.success} />
-      
-//       <CustomInput
-//         label="אימייל"
-//         value={formData.email}
-//         onChangeText={(text) => setFormData({ ...formData, email: text })}
-//         placeholder="הזן כתובת אימייל"
-//       />
-      
-//       <CustomInput
-//         label="טלפון"
-//         value={formData.phone}
-//         onChangeText={(text) => setFormData({ ...formData, phone: text })}
-//         placeholder="הזן מספר טלפון"
-//       />
-
-//       <CustomInput
-//         label="כתובת"
-//         value={formData.address}
-//         onChangeText={(text) => setFormData({ ...formData, address: text })}
-//         placeholder="הזן כתובת מגורים"
-//       />
-
-//       <View style={styles.modalButtons}>
-//         <TouchableOpacity 
-//           onPress={handleSubmit} 
-//           style={[styles.button, styles.primaryButton]}
-//         >
-//           <Text style={styles.buttonText}>שמירת שינויים</Text>
-//         </TouchableOpacity>
-        
-//         <TouchableOpacity 
-//           onPress={onClose} 
-//           style={[styles.button, styles.secondaryButton]}
-//         >
-//           <Text style={[styles.buttonText, styles.secondaryButtonText]}>ביטול</Text>
-//         </TouchableOpacity>
-//       </View>
-//     </View>
-//   );
-// };
-
-// // Main Profile Component
-// const ProfileScreen = () => {
-//   const navigation = useNavigation();
-//   const [isEditProfileVisible, setEditProfileVisible] = useState(false);
-//   const [userData, setUserData] = useState(null);
-//   const [status, setStatus] = useState({ error: '', success: '' });
-
-//   useEffect(() => {
-//     fetchProfile();
-//   }, []);
-
-//   const fetchProfile = async () => {
-//     try {
-//       const userStr = await AsyncStorage.getItem('user');
-//       if (!userStr) return;
-
-//       const user = JSON.parse(userStr);
-//       setUserData(user);
-//     } catch (error) {
-//       setStatus({ error: 'שגיאה בטעינת הפרופיל', success: '' });
-//       setTimeout(() => setStatus({ error: '', success: '' }), 3000);
-//     }
-//   };
-
-//   if (!userData) {
-//     return (
-//       <View style={styles.loaderContainer}>
-//         <ActivityIndicator size="large" color="#6366f1" />
-//       </View>
-//     );
-//   }
-
-//   const [firstName, lastName] = userData.name ? userData.name.split(' ') : ['', ''];
-
-//   return (
-//     <ScrollView style={styles.container}>
-//       <View style={styles.header}>
-//         <TouchableOpacity 
-//           onPress={() => navigation.goBack()} 
-//           style={styles.backButton}
-//         >
-//           <Text style={styles.backButtonText}>חזור</Text>
-//         </TouchableOpacity>
-        
-//         <ProfileAvatar 
-//           firstName={firstName} 
-//           lastName={lastName} 
-//         />
-//         <Text style={styles.userName}>{userData.name}</Text>
-//         <Text style={styles.userRole}>אזרח</Text>
-//       </View>
-
-//       <View style={styles.content}>
-//         <StatusMessage error={status.error} success={status.success} />
-        
-//         <View style={styles.section}>
-//           <Text style={styles.sectionTitle}>פרטים אישיים</Text>
-//           <View style={styles.cardsGrid}>
-//             <InfoCard 
-//               label="תעודת זהות" 
-//               value={userData.id} 
-//             />
-//             <InfoCard 
-//               label="אימייל" 
-//               value={userData.email} 
-//             />
-//             <InfoCard 
-//               label="טלפון" 
-//               value={userData.phone} 
-//             />
-//             {userData.address && (
-//               <InfoCard 
-//                 label="כתובת" 
-//                 value={userData.address} 
-//               />
-//             )}
-//           </View>
-//         </View>
-
-//         <View style={styles.actionButtons}>
-//           <TouchableOpacity
-//             onPress={() => setEditProfileVisible(true)}
-//             style={[styles.button, styles.primaryButton]}
-//           >
-//             <Text style={styles.buttonText}>עריכת פרופיל</Text>
-//           </TouchableOpacity>
-//         </View>
-//       </View>
-
-//       <AnimatedModal 
-//         visible={isEditProfileVisible} 
-//         onClose={() => setEditProfileVisible(false)}
-//       >
-//         <EditProfileModal
-//           userData={userData}
-//           onClose={() => setEditProfileVisible(false)}
-//           onSave={updatedUser => {
-//             setUserData(updatedUser);
-//             setStatus({ error: '', success: 'הפרופיל עודכן בהצלחה' });
-//             setTimeout(() => setStatus({ error: '', success: '' }), 3000);
-//           }}
-//         />
-//       </AnimatedModal>
-//     </ScrollView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#ffffff',
-//   },
-//   header: {
-//     backgroundColor: '#4f46e5',
-//     paddingTop: 60,
-//     paddingBottom: 40,
-//     borderBottomLeftRadius: 40,
-//     borderBottomRightRadius: 40,
-//     alignItems: 'center',
-//     position: 'relative',
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 4,
-//     },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 8,
-//     elevation: 5,
-//   },
-//   backButton: {
-//     position: 'absolute',
-//     top: 50,
-//     left: 20,
-//     zIndex: 1,
-//     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-//     padding: 8,
-//     borderRadius: 12,
-//   },
-//   backButtonText: {
-//     color: '#fff',
-//     fontSize: 16,
-//     fontWeight: '600',
-//   },
-//   avatarContainer: {
-//     marginBottom: 20,
-//   },
-//   avatar: {
-//     width: 120,
-//     height: 120,
-//     borderRadius: 60,
-//     backgroundColor: '#fff',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 4,
-//     },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 8,
-//     elevation: 5,
-//   },
-//   avatarText: {
-//     fontSize: 42,
-//     color: '#4f46e5',
-//     fontWeight: 'bold',
-//   },
-//   userName: {
-//     color: '#fff',
-//     fontSize: 28,
-//     fontWeight: 'bold',
-//     marginBottom: 8,
-//   },
-//   userRole: {
-//     color: '#e0e7ff',
-//     fontSize: 18,
-//     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-//     paddingHorizontal: 16,
-//     paddingVertical: 6,
-//     borderRadius: 20,
-//   },
-//   content: {
-//     padding: 24,
-//   },
-//   section: {
-//     marginBottom: 30,
-//   },
-//   sectionTitle: {
-//     fontSize: 22,
-//     fontWeight: 'bold',
-//     marginBottom: 20,
-//     color: '#1f2937',
-//     textAlign: 'right',
-//   },
-//   cardsGrid: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     gap: 16,
-//   },
-//   infoCard: {
-//     backgroundColor: '#fff',
-//     borderRadius: 20,
-//     padding: 20,
-//     width: '100%',
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 2,
-//     },
-//     shadowOpacity: 0.05,
-//     shadowRadius: 8,
-//     elevation: 3,
-//     marginBottom: 12,
-//   },
-//   infoLabel: {
-//     color: '#6b7280',
-//     fontSize: 16,
-//     marginBottom: 8,
-//     textAlign: 'right',
-//   },
-//   infoValue: {
-//     color: '#111827',
-//     fontSize: 18,
-//     fontWeight: '600',
-//     textAlign: 'right',
-//   },
-//   actionButtons: {
-//     gap: 16,
-//     marginTop: 12,
-//   },
-//   button: {
-//     padding: 16,
-//     borderRadius: 16,
-//     alignItems: 'center',
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 2,
-//     },
-//     shadowOpacity: 0.05,
-//     shadowRadius: 8,
-//     elevation: 3,
-//   },
-//   primaryButton: {
-//     backgroundColor: '#4f46e5',
-//   },
-//   secondaryButton: {
-//     backgroundColor: '#fff',
-//     borderWidth: 2,
-//     borderColor: '#4f46e5',
-//   },
-//   buttonText: {
-//     color: '#fff',
-//     fontSize: 18,
-//     fontWeight: '600',
-//   },
-//   secondaryButtonText: {
-//     color: '#4f46e5',
-//   },
-//   modalOverlay: {
-//     position: 'absolute',
-//     top: 0,
-//     left: 0,
-//     right: 0,
-//     bottom: 0,
-//     backgroundColor: 'rgba(0,0,0,0.6)',
-//     justifyContent: 'flex-end',
-//   },
-//   modalBackdrop: {
-//     position: 'absolute',
-//     top: 0,
-//     left: 0,
-//     right: 0,
-//     bottom: 0,
-//   },
-//   modalContent: {
-//     backgroundColor: '#fff',
-//     borderTopLeftRadius: 30,
-//     borderTopRightRadius: 30,
-//     padding: 24,
-//     minHeight: '60%',
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: -4,
-//     },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 12,
-//     elevation: 8,
-//   },
-//   modalInner: {
-//     padding: 16,
-//   },
-//   modalTitle: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     color: '#1f2937',
-//     marginBottom: 24,
-//     textAlign: 'right',
-//   },
-//   modalButtons: {
-//     gap: 16,
-//     marginTop: 24,
-//   },
-//   inputContainer: {
-//     marginBottom: 20,
-//   },
-//   inputLabel: {
-//     fontSize: 16,
-//     color: '#4b5563',
-//     marginBottom: 8,
-//     textAlign: 'right',
-//   },
-//   input: {
-//     backgroundColor: '#f9fafb',
-//     borderRadius: 12,
-//     padding: 16
-//   },
-//   });
-
-//   export default ProfileScreen;
 
 
 
@@ -526,7 +17,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://10.0.0.4:5001/api'; // Update with your server URL
+const API_BASE_URL = 'http://172.19.36.139:5001/api'; // Update with your server URL
 
 // Status Message Component
 const StatusMessage = ({ type, message }) => {
@@ -566,25 +57,45 @@ const ProfileScreen = ({ navigation }) => {
   useEffect(() => {
     fetchUserData();
   }, []);
-
   const fetchUserData = async () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
-      const token = await AsyncStorage.getItem('token');
+      const userToken = await AsyncStorage.getItem('userToken');
+      console.log("Using token:", userToken); // שינוי מ-`userToken` ל-`token`
 
+      if (!userToken || !userId) {
+        navigation.replace('Login'); // Navigate to login if token or userId is missing
+        return;
+      }
+  
+      console.log("Fetching profile for user:", userId); // Debugging
+      console.log("Using token:", userToken); // Debugging
+  
       const response = await axios.get(
-        `${API_BASE_URL}/profile/${userId}`,
+        `${API_BASE_URL}/profile/${userId}`, // Fixed template literal
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { 
+            Authorization: `Bearer ${userToken}`, // Correct format
+            'Content-Type': 'application/json' // Explicit content type
+          }
         }
       );
-
+  
       setUserData(response.data);
       setEditedData({
         email: response.data.email,
         phone: response.data.phone,
       });
+      setStatus({ type: 'success', message: 'פרטי המשתמש נטענו בהצלחה' });
     } catch (error) {
+      console.error('Error fetching profile:', error.response?.data || error.message); // Debugging
+  
+      // Handle token expiration or other errors
+      if (error.response?.status === 401) {
+        await AsyncStorage.multiRemove(['userToken', 'userId']);
+        navigation.replace('Login');
+      }
+  
       setStatus({
         type: 'error',
         message: error.response?.data?.message || 'שגיאה בטעינת הנתונים'
@@ -593,6 +104,32 @@ const ProfileScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
+  // const fetchUserData = async () => {
+  //   try {
+  //     const userId = await AsyncStorage.getItem('userId');
+  //     const token = await AsyncStorage.getItem('token');
+
+  //     const response = await axios.get(
+  //       `${API_BASE_URL}/profile/${userId}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       }
+  //     );
+
+  //     setUserData(response.data);
+  //     setEditedData({
+  //       email: response.data.email,
+  //       phone: response.data.phone,
+  //     });
+  //   } catch (error) {
+  //     setStatus({
+  //       type: 'error',
+  //       message: error.response?.data?.message || 'שגיאה בטעינת הנתונים'
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleUpdateProfile = async () => {
     try {
@@ -664,6 +201,7 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
+
       <View style={styles.header}>
         <Text style={styles.title}>פרופיל משתמש</Text>
         <View style={styles.avatar}>
@@ -926,17 +464,17 @@ const styles = StyleSheet.create({
   },
 });
 
-// // Add logout functionality
-// const handleLogout = async () => {
-//   try {
-//     await AsyncStorage.multiRemove(['token', 'userId']);
-//     navigation.reset({
-//       index: 0,
-//       routes: [{ name: 'Login' }],
-//     });
-//   } catch (error) {
-//     console.error('Error logging out:', error);
-//   }
-// };
+// Add logout functionality
+const handleLogout = async () => {
+  try {
+    await AsyncStorage.multiRemove(['token', 'userId']);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
+  } catch (error) {
+    console.error('Error logging out:', error);
+  }
+};
 
 export default ProfileScreen;

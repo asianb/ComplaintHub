@@ -60,11 +60,15 @@
 
 // export default HomePage;
 
-
+//homepageC.js 
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+// Add these imports
+// import ProfileScreen from '..screens/ProfileScreen';  // Adjust the path as needed
+import SendComplaint from './SendComplaint';  // Adjust the path as needed
+import ProfileScreen from './ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
