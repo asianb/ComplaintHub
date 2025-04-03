@@ -6,41 +6,91 @@ import { ArrowLeftIcon } from 'react-native-heroicons/outline';
 import { ScrollView } from 'react-native-gesture-handler';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login({ navigation }) {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
 
-  
-
-  function handleSubmit() {
+  async function handleSubmit() {
     console.log("Login button pressed");
-    
+  
     const userData = {
       id: id,
       password: password,
     };
   
-    axios.post("http://10.0.0.4:5001/login-user", userData)
-      .then(res => {
-        console.log("Server response:", res.data);
-        if (res.data.status === "ok") {
-          Alert.alert("הצלחה", res.data.message, [
+    try {
+      // Await the server response
+      const response = await axios.post("http://10.0.0.4:5001/login-user", userData);
+      console.log("Server response:", response.data);
+  
+      // Check if status is "ok"
+      if (response.data.status === "ok") {
+        console.log("Status is OK");
+  
+        try {
+          // Save the token
+          await AsyncStorage.setItem("token", response.data.data);
+          console.log("Token saved successfully");
+  
+          // Display success alert and navigate
+          Alert.alert("הצלחה", response.data.message, [
             {
               text: "OK",
-              onPress: () => navigation.navigate('HomePage')
-            }
+              onPress: () => navigation.navigate("HomePage"),
+            },
           ]);
+        } catch (storageError) {
+          console.error("AsyncStorage Error:", storageError);
+          throw new Error("Failed to save data to AsyncStorage");
         }
-      })
-      .catch(err => {
-        console.log("Error details:", err.response?.data);
-        
-        const errorMessage = err.response?.data?.message || "אירעה שגיאה, אנא נסי שוב";
-        
-        Alert.alert("שגיאה", errorMessage);
-      });
+      } else {
+        console.log("Status is not OK:", response.data.status);
+      }
+    } catch (error) {
+      console.error("Catch block error details:", error);
+  
+      const errorMessage = error.response?.data?.message || "אירעה שגיאה, אנא נסי שוב";
+      Alert.alert("שגיאה", errorMessage);
+    }
   }
+  
+
+  // async function handleSubmit() {
+  //   console.log("Login button pressed");
+    
+  //   const userData = {
+  //     id: id,
+  //     password: password,
+  //   };
+  // try{
+  //   const response = axios.post("http://10.0.0.4:5001/login-user", userData)
+  //     // .then(async res => {
+  //       console.log("Server response:", response.data);
+  //       if (res.data.status === "ok") {
+
+  //         await AsyncStorage.setItem('token', response.data.token);
+  //         await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+
+  //       console.log(user);
+  //         Alert.alert("הצלחה", response.data.message, [
+  //           {
+  //             text: "OK",
+  //             onPress: () => navigation.navigate('HomePage')
+  //           }
+  //         ]);
+  //       }
+  //     }
+
+  //     catch(error) {
+  //       console.log("Error details:", err.response?.data);
+        
+  //       const errorMessage = err.response?.data?.message || "אירעה שגיאה, אנא נסי שוב";
+        
+  //       Alert.alert("שגיאה", errorMessage);
+  //     };
+  // }
 
 
   return (

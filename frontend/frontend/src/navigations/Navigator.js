@@ -19,8 +19,8 @@ const HomePage = () => (
     screenOptions={({ route }) => ({
       tabBarIcon: ({ color, size }) => {
         let iconName;
-        if (route.name === 'Home') {
-          iconName = 'home';
+        if (route.name === 'SendComplaint') {
+          iconName = 'add';
         } else if (route.name === 'Profile') {
           iconName = 'person';
         } 
@@ -31,8 +31,8 @@ const HomePage = () => (
         
 
       },
-      tabBarActiveTintColor: '#FFD700',
-      tabBarInactiveTintColor: '#00b4d8',
+      tabBarActiveTintColor: '#00b4d8',
+      tabBarInactiveTintColor: '#000000',
     })}
   >
     <Tab.Screen name="Profile" component={ProfileScreen} />
