@@ -26,6 +26,7 @@ import HomePage from '../screens/homePageC'
 import CitizenList from '../screens/CitizenList'
 // import ProfileScreen from '../screens/ProfileScreen'
 import CitizenDashboard from '../screens/CitizenDashboard'
+import SpeechToTextApp from '../screens/SpeechToTextApp'
 
 const Tab = createBottomTabNavigator();
 const TabNavigator = () => (
@@ -51,7 +52,7 @@ const TabNavigator = () => (
 
 const Stack = createStackNavigator();
 const AppNavigator = () => (
-  <Stack.Navigator initialRouteName="WelcomeScreen">
+  <Stack.Navigator initialRouteName="SpeechToTextApp">
     <Stack.Screen name="loginScreen" component={LoginScreen} options={{ headerShown: false }} />
     <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false }} />
     <Stack.Screen   name="ManagerDashboard" component={ManagerDashboard} options={{ headerLeft: null, headerShown: false  }}    />
@@ -62,7 +63,7 @@ const AppNavigator = () => (
 
 
     <Stack.Screen name="Chat" component={ChatInterface} />
-    <Stack.Screen name="ComplaintForm" component={ComplaintForm} />
+    {/* <Stack.Screen name="ComplaintForm" component={ComplaintForm} /> */}
     <Stack.Screen name="ViewComplaints" component={ViewComplaints} />
     <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
     <Stack.Screen name="TabNavigator" component={TabNavigator} />
@@ -72,6 +73,10 @@ const AppNavigator = () => (
     <Stack.Screen name="HomePage" component={HomePage} />
     <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
     <Stack.Screen name="CitizenDashboard" component={CitizenDashboard} />
+
+
+
+    <Stack.Screen name="SpeechToTextApp" component={SpeechToTextApp} />
 
 
 
