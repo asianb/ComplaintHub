@@ -27,6 +27,35 @@ import CitizenList from '../screens/CitizenList'
 // import ProfileScreen from '../screens/ProfileScreen'
 import CitizenDashboard from '../screens/CitizenDashboard'
 import SpeechToTextApp from '../screens/SpeechToTextApp'
+import EmployeeComplaints from '../screens/EmployeeComplaints'
+import AddResponse from '../screens/AddResponse'
+import ComplaintDetails from '../screens/ComplaintDetails'
+import AssignedComplaints from '../screens/AssignedComplaints'
+import MyComplaints from '../screens/MyComplaints'
+import CitizenComplaintDetails from '../screens/CitizenComplaintDetails';
+import FeedbackDashboard from '../screens/FeedbackDashboard'
+import EmployeeComplaintDetails from '../screens/EmployeeComplaintDetails'
+import CalendarWithTasks from '../screens/CalendarWithTasks'
+
+
+
+import AdminMainScreen from '../screens/AdminMainScreen'
+import TrendsReportScreen from '../screens/TrendsReportScreen'
+import HighRiskComplaintsScreen  from '../screens/HighRiskComplaintsScreen';
+import AIAnalysisScreen from '../screens/AIAnalysisScreen'
+import AdminAIDashboard from '../screens/AdminAIDashboard'
+
+import AdminTabNavigator from '../screens/AdminNavigation'
+
+import UnifiedManagerDashboard from '../screens/AdminDashboard'
+import EmployeeFollowUpManagement from '../screens/EmployeeFollowUpManagement'
+
+
+import SimpleGuestComplaintForm from '../screens/SimpleGuestComplaintForm'
+
+import ForgotPassword from '../screens/ForgotPassword'
+
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen'
 
 const Tab = createBottomTabNavigator();
 const TabNavigator = () => (
@@ -52,7 +81,7 @@ const TabNavigator = () => (
 
 const Stack = createStackNavigator();
 const AppNavigator = () => (
-  <Stack.Navigator initialRouteName="SpeechToTextApp">
+  <Stack.Navigator initialRouteName="WelcomeScreen">
     <Stack.Screen name="loginScreen" component={LoginScreen} options={{ headerShown: false }} />
     <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false }} />
     <Stack.Screen   name="ManagerDashboard" component={ManagerDashboard} options={{ headerLeft: null, headerShown: false  }}    />
@@ -77,9 +106,34 @@ const AppNavigator = () => (
 
 
     <Stack.Screen name="SpeechToTextApp" component={SpeechToTextApp} />
+    <Stack.Screen name="EmployeeComplaints" component={EmployeeComplaints} />
+    <Stack.Screen name="AddResponse" component={AddResponse} />
+    <Stack.Screen name="ComplaintDetails" component={ComplaintDetails} />
+    <Stack.Screen name="ComplaintForm" component={ComplaintForm} />
+    <Stack.Screen name="AssignedComplaints" component={AssignedComplaints} />
+    <Stack.Screen name="MyComplaints" component={MyComplaints} />
+    <Stack.Screen name="CitizenComplaintDetails" component={CitizenComplaintDetails} options={{ headerShown: false }}/>
+    <Stack.Screen name="FeedbackDashboard" component={FeedbackDashboard} options={{ headerShown: false }}/>
+    <Stack.Screen name="EmployeeComplaintDetails" component={EmployeeComplaintDetails} options={{ headerShown: false }}/>
+    <Stack.Screen name="CalendarWithTasks" component={CalendarWithTasks} options={{ headerShown: false }}/>
+   
+   
+    <Stack.Screen name="AdminMainScreen" component={AdminMainScreen} options={{ headerShown: false }}/>
+    <Stack.Screen name="AIAnalysisScreen" component={AIAnalysisScreen} options={{ headerShown: false }}/>
+    <Stack.Screen name="HighRiskComplaintsScreen" component={HighRiskComplaintsScreen} options={{ headerShown: false }}/>
+    <Stack.Screen name="TrendsReportScreen" component={TrendsReportScreen} options={{ headerShown: false }}/>
+    <Stack.Screen name="AdminAIDashboard" component={AdminAIDashboard} options={{ headerShown: false }}/>
+  <Stack.Screen name="AdminDashboard" component={AdminTabNavigator} />
 
+  <Stack.Screen name="newAdminDashboard" component={UnifiedManagerDashboard} />
 
+  
+  <Stack.Screen name="EmployeeFollowUpManagement" component={EmployeeFollowUpManagement} />
 
+  <Stack.Screen name="SimpleGuestComplaintForm" component={SimpleGuestComplaintForm} />
+
+<Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+<Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
 
     
   </Stack.Navigator>

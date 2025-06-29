@@ -235,6 +235,147 @@ app.delete('/api/Citizen/:id', async (req, res) => {
   }
 });
 
+// הוספות לשרת - app.js
+
+// הוסף את החבילות הנדרשות בתחילת הקובץ
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
+// יצירת transporter למייל 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+           // add here the mail         
+
+  }
+});
+transporter.verify(function(error, success) {
+  if (error) {
+    console.log('Email connection error:', error);
+  } else {
+    console.log('Email server is ready!');
+  }
+});
+// סכמה לקודי איפוס סיסמה
+const ResetCodeSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  code: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now, expires: 600 } // 10 דקות
+});
+
+const ResetCode = mongoose.model('ResetCode', ResetCodeSchema);
+
+// נתיב לשליחת קוד לאיפוס סיסמה
+app.post('/forgot-password', async (req, res) => {
+  try {
+    const { id } = req.body;
+    
+    if (!id) {
+      return res.status(400).json({ 
+        status: "error", 
+        message: "נא להכניס תעודת זהות" 
+      });
+    }
+
+    // חיפוש המשתמש
+    const user = await User.findOne({ id: id });
+    if (!user) {
+      return res.status(404).json({ 
+        status: "error", 
+        message: "משתמש לא נמצא במערכת" 
+      });
+    }
+
+    // יצירת קוד אקראי של 6 ספרות
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // שמירת הקוד במסד הנתונים
+    await ResetCode.findOneAndDelete({ userId: id }); // מחיקת קוד קודם אם קיים
+    await ResetCode.create({
+      userId: id,
+      code: resetCode
+    });
+
+    // שליחת המייל
+    const mailOptions = {
+      from: 'your-email@gmail.com',
+      to: user.email,
+      subject: 'איפוס סיסמה - קוד אימות',
+      html: `
+        <div style="direction: rtl; text-align: right; font-family: Arial, sans-serif;">
+          <h2>איפוס סיסמה</h2>
+          <p>שלום ${user.name},</p>
+          <p>קיבלנו בקשה לאיפוס סיסמה עבור החשבון שלך.</p>
+          <p>קוד האימות שלך הוא:</p>
+          <h1 style="background-color: #f0f0f0; padding: 20px; text-align: center; letter-spacing: 5px;">
+            ${resetCode}
+          </h1>
+          <p>הקוד תקף למשך 10 דקות בלבד.</p>
+          <p>אם לא ביקשת איפוס סיסמה, התעלם ממייל זה.</p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({
+      status: "success",
+      message: "קוד אימות נשלח למייל שלך"
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ 
+      status: "error", 
+      message: "שגיאה בשליחת קוד האימות" 
+    });
+  }
+});
+
+// נתיב לאימות קוד ואיפוס סיסמה
+app.post('/reset-password', async (req, res) => {
+  try {
+    const { id, code, newPassword } = req.body;
+
+    if (!id || !code || !newPassword) {
+      return res.status(400).json({ 
+        status: "error", 
+        message: "נא למלא את כל השדות" 
+      });
+    }
+
+    // בדיקת הקוד
+    const resetCode = await ResetCode.findOne({ userId: id, code: code });
+    if (!resetCode) {
+      return res.status(400).json({ 
+        status: "error", 
+        message: "קוד אימות שגוי או פג תוקף" 
+      });
+    }
+
+    // עדכון הסיסמה
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.findOneAndUpdate(
+      { id: id },
+      { password: hashedPassword }
+    );
+
+    // מחיקת הקוד לאחר שימוש
+    await ResetCode.findByIdAndDelete(resetCode._id);
+
+    res.json({
+      status: "success",
+      message: "הסיסמה אופסה בהצלחה"
+    });
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ 
+      status: "error", 
+      message: "שגיאה באיפוס הסיסמה" 
+    });
+  }
+});
 
 app.use(cors({
   origin: '*',  // בפיתוח בלבד! בproduction צריך להגדיר את הדומיין הספציפי

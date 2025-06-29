@@ -17,7 +17,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://172.19.36.139:5001/api'; // Update with your server URL
+const API_BASE_URL = 'http://192.168.1.3:5001/api'; // Update with your server URL
 
 // Status Message Component
 const StatusMessage = ({ type, message }) => {

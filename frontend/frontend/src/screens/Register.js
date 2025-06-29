@@ -75,7 +75,7 @@ const Register = () => {
   
 // Client-side (React Native)
 // Updated connection and registration handling
-const SERVER_URL = "http://172.19.36.139:5001";
+const SERVER_URL = "http://172.19.36.84:5001";
 
 
 const handleSignUp = async () => {

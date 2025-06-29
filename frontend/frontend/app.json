@@ -25,16 +25,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-font",
-      [
-        "@react-native-voice/voice",
-        {
-          "microphonePermission": "Allow Voice to use the microphone",
-          "speechRecognitionPermission": "Allow Voice to recognize your speech"
-        }
-      ]
-    ]
+   "plugins": [
+  "expo-font"
+]
+
     
   }
 }

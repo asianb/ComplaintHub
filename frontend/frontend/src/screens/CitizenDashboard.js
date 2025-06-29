@@ -164,7 +164,7 @@ const fetchComplaints = async () => {
         return;
       }
 
-      const response = await axios.get(`http://172.19.36.139:5000/my-complaints`, {
+      const response = await axios.get(`http://192.168.1.4:5000/my-complaints`, {
         headers: {
           'Authorization': `Bearer ${userToken}`,
           'Content-Type': 'application/json'
